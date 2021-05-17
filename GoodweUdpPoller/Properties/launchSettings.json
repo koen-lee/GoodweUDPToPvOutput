@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "GoodweUdpPoller": {
+    "GoodweUdpPoller inverter": {
       "commandName": "Project",
       "commandLineArgs": "--host=192.168.2.129"
+    },
+    "GoodweUdpPoller discovery": {
+      "commandName": "Project",
+      "commandLineArgs": ""
     }
   }
 }
