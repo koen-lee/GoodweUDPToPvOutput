@@ -24,26 +24,24 @@ namespace GoodweUdpPoller
                 throw new InvalidDataException($"CRC mismatch");
             }
 
-            payload = data;
-
             return new InverterTelemetry
             {
-                Year = payload[5] + 2000,
-                Month = payload[6],
-                Day = payload[7],
-                Hour = payload[8],
-                Minute = payload[9],
-                Second = payload[10],
-                Vpv = payload.To16BitScale10(11),
-                Ipv = payload.To16BitScale10(13),
-                Vac = payload.To16BitScale10(41),
-                Iac = payload.To16BitScale10(47),
-                GridFrequency = payload.To16BitScale100(53),
-                Power = payload.To16Bit(61) * 10,
-                Status = (InverterStatus)payload[63],
-                Temperature = payload.To16BitScale10(87),
-                EnergyToday = payload.To16BitScale10(93),
-                EnergyLifetime = payload.To16BitScale10(97)/*probably 32 bit*/,
+                Year = data[5] + 2000,
+                Month = data[6],
+                Day = data[7],
+                Hour = data[8],
+                Minute = data[9],
+                Second = data[10],
+                Vpv = data.To16BitScale10(11),
+                Ipv = data.To16BitScale10(13),
+                Vac = data.To16BitScale10(41),
+                Iac = data.To16BitScale10(47),
+                GridFrequency = data.To16BitScale100(53),
+                Power = data.To16Bit(61),
+                Status = (InverterStatus)data[63],
+                Temperature = data.To16BitScale10(87),
+                EnergyToday = data.To16BitScale10(93),
+                EnergyLifetime = data.To16BitScale10(97)/*probably 32 bit*/,
             };
         }
 
