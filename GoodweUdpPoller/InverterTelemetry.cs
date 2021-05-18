@@ -47,6 +47,9 @@ namespace GoodweUdpPoller
             };
         }
 
+        /// <summary>
+        /// Temperature in degrees Celsius
+        /// </summary>
         public double Temperature { get; set; }
 
         public InverterStatus Status { get; set; }
@@ -55,11 +58,15 @@ namespace GoodweUdpPoller
 
         public double EnergyToday { get; set; }
 
+        /// <summary>
+        /// Momentary power at timestamp, in W
+        /// </summary>
         public double Power { get; set; }
 
         public double Iac { get; set; }
 
         public double Vac { get; set; }
+
         public double GridFrequency { get; set; }
 
         /// <summary>
@@ -76,17 +83,17 @@ namespace GoodweUdpPoller
         /// Timestamp of the telemetry according to the inverter, second precision.
         /// </summary>
         public DateTimeOffset Timestamp => new DateTimeOffset(Year, Month, Day, Hour, Minute, Second, 0, TimeSpan.Zero);
-        public byte Second { get; set; }
+        private byte Second { get; set; }
 
-        public byte Minute { get; set; }
+        private byte Minute { get; set; }
 
-        public byte Hour { get; set; }
+        private byte Hour { get; set; }
 
-        public byte Day { get; set; }
+        private byte Day { get; set; }
 
-        public byte Month { get; set; }
+        private byte Month { get; set; }
 
-        public int Year { get; set; }
+        private int Year { get; set; }
 
         public static byte[] GoodweCrc(ReadOnlySpan<byte> payload)
         {
