@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json.Serialization;
 
 namespace GoodweUdpPoller
 {
@@ -7,11 +8,11 @@ namespace GoodweUdpPoller
     {
         public static InverterTelemetry Create(ReadOnlySpan<byte> data)
         {
-            var expectedLength = 160;
+            var expectedLength = 153;
             if (data.Length != expectedLength)
                 throw new InvalidDataException($"Got size {data.Length}, expected {expectedLength}");
             var header = data.Slice(0, 2);
-            if (!header.SequenceEqual(new byte[] { 0x55, 0xaa }))
+            if (!header.SequenceEqual(new byte[] { 0xaa, 0x55 }))
             {
                 throw new InvalidDataException($"Wrong header");
             }
@@ -23,8 +24,69 @@ namespace GoodweUdpPoller
                 throw new InvalidDataException($"CRC mismatch");
             }
 
-            throw new NotImplementedException();
+            payload = data;
+
+            return new InverterTelemetry
+            {
+                Year = payload[5] + 2000,
+                Month = payload[6],
+                Day = payload[7],
+                Hour = payload[8],
+                Minute = payload[9],
+                Second = payload[10],
+                Vpv = payload.To16BitScale10(11),
+                Ipv = payload.To16BitScale10(13),
+                Vac = payload.To16BitScale10(41),
+                Iac = payload.To16BitScale10(47),
+                GridFrequency = payload.To16BitScale100(53),
+                Power = payload.To16Bit(61) * 10,
+                Status = (InverterStatus)payload[63],
+                Temperature = payload.To16BitScale10(87),
+                EnergyToday = payload.To16BitScale10(93),
+                EnergyLifetime = payload.To16BitScale10(97)/*probably 32 bit*/,
+            };
         }
+
+        public double Temperature { get; set; }
+
+        public InverterStatus Status { get; set; }
+
+        public double EnergyLifetime { get; set; }
+
+        public double EnergyToday { get; set; }
+
+        public double Power { get; set; }
+
+        public double Iac { get; set; }
+
+        public double Vac { get; set; }
+        public double GridFrequency { get; set; }
+
+        /// <summary>
+        /// DC Current from the solar array, in A 
+        /// </summary>
+        public double Ipv { get; set; }
+
+        /// <summary>
+        /// DC Voltage from the solar array, in V
+        /// </summary>
+        public double Vpv { get; set; }
+
+        /// <summary>
+        /// Timestamp of the telemetry according to the inverter, second precision.
+        /// </summary>
+        public DateTimeOffset Timestamp => new DateTimeOffset(Year, Month, Day, Hour, Minute, Second, 0, TimeSpan.Zero);
+        public byte Second { get; set; }
+
+        public byte Minute { get; set; }
+
+        public byte Hour { get; set; }
+
+        public byte Day { get; set; }
+
+        public byte Month { get; set; }
+
+        public int Year { get; set; }
 
         public static byte[] GoodweCrc(ReadOnlySpan<byte> payload)
         {
@@ -33,20 +95,27 @@ namespace GoodweUdpPoller
 
             for (var i = 0; i < payload.Length; i++)
             {
-                crc = crc ^ payload[i];
+                crc ^= payload[i];
 
                 for (var j = 0; j < 8; j++)
                 {
                     odd = (crc & 0x0001) != 0;
-                    crc = crc >> 1;
+                    crc >>= 1;
                     if (odd)
                     {
-                        crc = crc ^ 0xA001;
+                        crc ^= 0xA001;
                     }
                 }
             }
-
             return BitConverter.GetBytes((ushort)crc);
+        }
+
+        public enum InverterStatus
+        {
+            Waiting,
+            Normal,
+            Error,
+            Checking
         }
     }
 }

@@ -19,14 +19,26 @@ namespace GoodweUdpPoller
                                                 "FF-01-42-0F-56-FF-FF-FF-FF-FF-FF-05-E1-FF-FF-FF-" +
                                                 "FF-FF-FF-01-2A-00-39-04-1F";
 
-        private static byte[] replyBytes = replyAsString.Split("-")
-            .Select(s => byte.Parse(s, NumberStyles.AllowHexSpecifier)).ToArray();
+        private static byte[] replyBytes = ReplyBytes(replyAsString);
+
+        private static byte[] ReplyBytes(string asString)
+        {
+            return asString.Split("-")
+                .Select(s => byte.Parse(s, NumberStyles.AllowHexSpecifier)).ToArray();
+        }
 
         [Fact]
         public void CrcOfReplyMatches()
         {
             var result = InverterTelemetry.GoodweCrc(replyBytes.Skip(2).SkipLast(2).ToArray());
             Assert.Equal(new byte[] { 0x04, 0x1F }, result);
+        }
+
+        [Fact]
+        public void Given_bytes_When_Create_Then_a_valid_InverterTelemetry_is_created()
+        {
+            var result = InverterTelemetry.Create(replyBytes);
+            Assert.Equal(50.0, result.GridFrequency);
         }
     }
 }

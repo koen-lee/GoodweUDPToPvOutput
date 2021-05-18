@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace GoodweUdpPoller
@@ -29,7 +26,10 @@ namespace GoodweUdpPoller
             }
             else
             {
-                await poller.QueryInverter(host);
+                Console.WriteLine($"Querying {host}");
+                var response = await poller.QueryInverter(host);
+                Console.WriteLine(response);
+
             }
         }
     }

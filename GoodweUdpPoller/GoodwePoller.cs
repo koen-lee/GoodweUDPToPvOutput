@@ -52,7 +52,7 @@ namespace GoodweUdpPoller
             };
         }
 
-        public async Task QueryInverter(string host)
+        public async Task<InverterTelemetry> QueryInverter(string host)
         {
             Console.WriteLine($"Querying {host}");
             using var client = new UdpClient();
@@ -60,7 +60,7 @@ namespace GoodweUdpPoller
             await client.SendAsync(payload, payload.Length, host, port: 8899);
             var result = await client.ReceiveAsync(ListenTimeout);
             var response = InverterTelemetry.Create(result.Buffer);
-
+            return response;
         }
     }
 }
