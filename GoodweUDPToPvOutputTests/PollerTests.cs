@@ -36,7 +36,7 @@ namespace GoodweUdpPoller
         [Fact]
         public void Given_bytes_When_Create_Then_a_valid_InverterTelemetry_is_created()
         {
-            var result = InverterTelemetry.Create(replyBytes);
+            var result = GoodwePoller.CreateTelemetryFrom(replyBytes, null);
             Assert.Equal(50.0, result.GridFrequency);
         }
     }
