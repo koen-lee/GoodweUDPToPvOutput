@@ -50,3 +50,14 @@ Options:
 }
 <=OK 200: Added Status
 ```
+## Installation
+A working PVOutput account is assumed.
+Extract the executable to a suitable place.
+For a first run, you can run it without arguments:
+`> ./GoodweUdpPoller`
+It should discover your inverter.
+Adapt the included `pollgoodwe.sh` to use your PVOutput settings.
+Schedule the script to run on your configured interval (either 5 or 15 minutes):
+`> crontab -e`
+A sample cron line to push every five minutes:
+`*/5 *   *   *   *    /home/pi/goodweudppoller/pollgoodwe.sh`
