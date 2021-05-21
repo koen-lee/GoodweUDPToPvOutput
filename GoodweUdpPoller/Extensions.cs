@@ -20,10 +20,19 @@ namespace GoodweUdpPoller
         {
             return (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer.Slice(offset)));
         }
+        public static uint To32Bit(this ReadOnlySpan<byte> buffer, int offset)
+        {
+            return (uint)IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer.Slice(offset)));
+        }
 
         public static double To16BitScale10(this ReadOnlySpan<byte> buffer, int offset)
         {
             return Math.Round(To16Bit(buffer, offset) * 0.1, 1);
+        }
+
+        public static double To32BitScale10(this ReadOnlySpan<byte> buffer, int offset)
+        {
+            return Math.Round(To32Bit(buffer, offset) * 0.1, 1);
         }
 
         public static double To16BitScale100(this ReadOnlySpan<byte> buffer, int offset)

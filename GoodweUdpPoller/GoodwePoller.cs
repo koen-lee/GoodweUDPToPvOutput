@@ -54,6 +54,7 @@ namespace GoodweUdpPoller
         public async Task<InverterTelemetry> QueryInverter(string host)
         {
             using var client = new UdpClient();
+
             var payload = new byte[] { 0x7f, 0x03, 0x75, 0x94, 0x00, 0x49, 0xd5, 0xc2 };
             await client.SendAsync(payload, payload.Length, host, port: 8899);
             var result = await client.ReceiveAsync(ListenTimeout);
@@ -93,7 +94,7 @@ namespace GoodweUdpPoller
                 Status = (InverterTelemetry.InverterStatus)data[63],
                 Temperature = data.To16BitScale10(87),
                 EnergyToday = data.To16BitScale10(93),
-                EnergyLifetime = data.To16BitScale10(97)/*probably 32 bit*/,
+                EnergyLifetime = data.To32BitScale10(95),
                 ResponseIp = responseIp
             };
         }
