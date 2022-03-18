@@ -22,18 +22,20 @@ namespace GoodweUdpPoller
         /// <param name="pvoutputSystemId">System Id for API access on pvoutput.org, see https://pvoutput.org/help/api_specification.html </param>
         /// <param name="pvoutputApikey">API key for API access on pvoutput.org, see https://pvoutput.org/help/api_specification.html </param>
         /// <param name="pvoutputRequestUrl">optional url to post to</param>
+        /// <param name="broadcastAddress">the address to send broadcasts to, for example 192.168.0.255 if that is your subnet</param>
         public static async Task Main(
             string host = null,
             int timeout = 1000,
             int pvoutputSystemId = 0,
             string pvoutputApikey = "",
-            string pvoutputRequestUrl = "https://pvoutput.org/service/r2/addstatus.jsp")
+            string pvoutputRequestUrl = "https://pvoutput.org/service/r2/addstatus.jsp",
+            string broadcastAddress = "255.255.255.255")
         {
             var listenTimeout = TimeSpan.FromMilliseconds(timeout);
             var poller = new GoodwePoller(listenTimeout);
             if (host == null)
             {
-                await foreach (var foundInverter in poller.DiscoverInvertersAsync())
+                await foreach (var foundInverter in poller.DiscoverInvertersAsync(broadcastAddress))
                 {
                     if (foundInverter.Ssid == null /*== not a Goodwe inverter*/)
                         continue;

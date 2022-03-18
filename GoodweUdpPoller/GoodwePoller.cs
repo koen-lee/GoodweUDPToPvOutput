@@ -16,10 +16,10 @@ namespace GoodweUdpPoller
             ListenTimeout = listenTimeout;
         }
 
-        public async IAsyncEnumerable<Inverter> DiscoverInvertersAsync()
+        public async IAsyncEnumerable<Inverter> DiscoverInvertersAsync(string broadcastAddress = "255.255.255.255")
         {
             using var channel = new UdpClient { EnableBroadcast = true };
-            await SendHello(channel);
+            await SendHello(channel, broadcastAddress);
 
             Console.WriteLine("Waiting for greetings back");
             var timeout = Task.Delay(ListenTimeout);
@@ -34,11 +34,10 @@ namespace GoodweUdpPoller
             }
         }
 
-        private async Task SendHello(UdpClient client)
+        private async Task SendHello(UdpClient client, string broadcastAddress)
         {
             var payload = Encoding.ASCII.GetBytes("WIFIKIT-214028-READ");
-            //await client.SendAsync(payload, payload.Length, "255.255.255.255", 48899);
-            await client.SendAsync(payload, payload.Length, "192.168.2.255", 48899);
+            await client.SendAsync(payload, payload.Length, broadcastAddress, 48899);
         }
 
         private async Task<Inverter> RecieveGreetings(UdpClient client)
